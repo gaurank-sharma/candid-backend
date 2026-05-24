@@ -1,17 +1,19 @@
 const mongoose = require('mongoose');
-const dns = require('dns');
 
-// Force Google DNS — avoids link-local IPv6 router DNS refusing SRV queries
-dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+let cached = { conn: null, promise: null };
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, { family: 4 });
-    console.log('MongoDB connected — CandidDB');
-  } catch (err) {
-    console.error('MongoDB connection failed:', err.message);
-    process.exit(1);
+async function connectDB() {
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
   }
-};
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
 
 module.exports = connectDB;
