@@ -1,14 +1,20 @@
 const mongoose = require('mongoose');
 
-let cached = { conn: null, promise: null };
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
 async function connectDB() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(process.env.MONGO_URI, {
+    const opts = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+    };
+    cached.promise = mongoose.connect(process.env.MONGO_URI, opts).then((mongoose) => {
+      return mongoose;
     });
   }
 
