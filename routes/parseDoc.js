@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const mammoth = require("mammoth");
-const pdfParse = require("pdf-parse");
+const pdfParse = require("pdf-parse/lib/pdf-parse");
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
